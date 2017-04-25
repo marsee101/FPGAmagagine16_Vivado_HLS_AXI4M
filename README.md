@@ -8,7 +8,8 @@ http://www.kumikomi.net/fpga/contents/0016.php
 アルゴリズム通りに記述したフィルタCプログラムをハードウェア化してみよう　P.78</p></blockquote>と<blockquote><p>第2章　【ステップアップで高速化!】
 無料のVivado HL WebPACK Editionで高位合成にチャレンジしよう(AXI4マスタ編)<BR>
 ライン・バッファ/バースト転送/最適化指示子を駆使した高速化テクニック　P.94</p></blockquote>の記事中のソースコードと画像です。
-
+<BR>
+<BR>
 2017/04/25 : FPGAマガジンNo.17 の「高位合成ツールVivado HLS 特設記事」のソースコードを追加しました。<BR>
 第2章<BR>
 【これ以上の高速化は難しい?!】<BR>
