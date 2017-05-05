@@ -1,4 +1,9 @@
-// lap_filter_tb.c
+// lap_filter_tb.c by marsee
+//
+// 2017/05/04 : takseiã•ã‚“ã®ã”æŒ‡æ‘˜ã«ã‚ˆã‚ŠintX_tã‚’ä½¿ã£ãŸå®£è¨€ã«å¤‰æ›´ã€‚takseiã•ã‚“ã‚ã‚ŠãŒã¨ã†ã”ã–ã„ã¾ã—ãŸ
+//              å¤‰æ•°ã®å‹ã®ã‚µã‚¤ã‚ºã®é•ã„ã«ã‚ˆã£ã¦Linuxã®ï¼–ï¼”ãƒ“ãƒƒãƒˆç‰ˆã§ã¯å‹•ä½œã—ãªã‹ã£ãŸãŸã‚ã§ã™
+//              http://marsee101.blog19.fc2.com/blog-entry-3354.html#comment2808
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,26 +20,26 @@ int main()
 {
     int *s, *h;
     long x, y;
-    BITMAPFILEHEADER bmpfhr; // BMPƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒwƒbƒ_(for Read)
-    BITMAPINFOHEADER bmpihr; // BMPƒtƒ@ƒCƒ‹‚ÌINFOƒwƒbƒ_(for Read)
+    BITMAPFILEHEADER bmpfhr; // BMPãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ˜ãƒƒãƒ€(for Read)
+    BITMAPINFOHEADER bmpihr; // BMPãƒ•ã‚¡ã‚¤ãƒ«ã®INFOãƒ˜ãƒƒãƒ€(for Read)
     FILE *fbmpr, *fbmpw;
     int *rd_bmp, *hw_lapd, *sw_lapd;
     int blue, green, red;
     char blue_c, green_c, red_c;
 
-    if ((fbmpr = fopen("test.bmp", "rb")) == NULL){ // test.bmp ‚ğƒI[ƒvƒ“
+    if ((fbmpr = fopen("test.bmp", "rb")) == NULL){ // test.bmp ã‚’ã‚ªãƒ¼ãƒ—ãƒ³
         fprintf(stderr, "Can't open test.bmp by binary read mode\n");
         exit(1);
     }
-    // bmpƒwƒbƒ_‚Ì“Ç‚İo‚µ
-    fread(&bmpfhr.bfType, sizeof(char), 2, fbmpr);
-    fread(&bmpfhr.bfSize, sizeof(long), 1, fbmpr);
-    fread(&bmpfhr.bfReserved1, sizeof(short), 1, fbmpr);
-    fread(&bmpfhr.bfReserved2, sizeof(short), 1, fbmpr);
-    fread(&bmpfhr.bfOffBits, sizeof(long), 1, fbmpr);
+    // bmpãƒ˜ãƒƒãƒ€ã®èª­ã¿å‡ºã—
+    fread(&bmpfhr.bfType, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfSize, sizeof(uint32_t), 1, fbmpr);
+    fread(&bmpfhr.bfReserved1, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfReserved2, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfOffBits, sizeof(uint32_t), 1, fbmpr);
     fread(&bmpihr, sizeof(BITMAPINFOHEADER), 1, fbmpr);
 
-    // ƒsƒNƒZƒ‹‚ğ“ü‚ê‚éƒƒ‚ƒŠ‚ğƒAƒƒP[ƒg‚·‚é
+    // ãƒ”ã‚¯ã‚»ãƒ«ã‚’å…¥ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã™ã‚‹
     if ((rd_bmp =(int *)malloc(sizeof(int) * (bmpihr.biWidth * bmpihr.biHeight))) == NULL){
         fprintf(stderr, "Can't allocate rd_bmp memory\n");
         exit(1);
@@ -48,7 +53,7 @@ int main()
         exit(1);
     }
 
-    // rd_bmp ‚ÉBMP‚ÌƒsƒNƒZƒ‹‚ğ‘ã“üB‚»‚ÌÛ‚ÉAs‚ğ‹t“]‚·‚é•K—v‚ª‚ ‚é
+    // rd_bmp ã«BMPã®ãƒ”ã‚¯ã‚»ãƒ«ã‚’ä»£å…¥ã€‚ãã®éš›ã«ã€è¡Œã‚’é€†è»¢ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
     for (y=0; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             blue = fgetc(fbmpr);
@@ -59,10 +64,10 @@ int main()
     }
     fclose(fbmpr);
 
-    lap_filter_axim((int *)rd_bmp, (int *)hw_lapd);    // ƒn[ƒhƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^
-    laplacian_filter_soft(rd_bmp, sw_lapd, bmpihr.biWidth, bmpihr.biHeight);    // ƒ\ƒtƒgƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^
+    lap_filter_axim((int *)rd_bmp, (int *)hw_lapd);    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿
+    laplacian_filter_soft(rd_bmp, sw_lapd, bmpihr.biWidth, bmpihr.biHeight);    // ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿
 
-    // ƒn[ƒhƒEƒFƒA‚Æƒ\ƒtƒgƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^‚Ì’l‚Ìƒ`ƒFƒbƒN
+    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã¨ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿ã®å€¤ã®ãƒã‚§ãƒƒã‚¯
     for (y=0, h=hw_lapd, s=sw_lapd; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             if (*h != *s){
@@ -76,20 +81,20 @@ int main()
     }
     printf("Success HW and SW results match\n");
 
-    // ƒn[ƒhƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^‚ÌŒ‹‰Ê‚ğ temp_lap.bmp ‚Öo—Í‚·‚é
+    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ã®çµæœã‚’ temp_lap.bmp ã¸å‡ºåŠ›ã™ã‚‹
     if ((fbmpw=fopen("test_lap.bmp", "wb")) == NULL){
         fprintf(stderr, "Can't open temp_lap.bmp by binary write mode\n");
         exit(1);
     }
-    // BMPƒtƒ@ƒCƒ‹ƒwƒbƒ_‚Ì‘‚«‚İ
-    fwrite(&bmpfhr.bfType, sizeof(char), 2, fbmpw);
-    fwrite(&bmpfhr.bfSize, sizeof(long), 1, fbmpw);
-    fwrite(&bmpfhr.bfReserved1, sizeof(short), 1, fbmpw);
-    fwrite(&bmpfhr.bfReserved2, sizeof(short), 1, fbmpw);
-    fwrite(&bmpfhr.bfOffBits, sizeof(long), 1, fbmpw);
+    // BMPãƒ•ã‚¡ã‚¤ãƒ«ãƒ˜ãƒƒãƒ€ã®æ›¸ãè¾¼ã¿
+    fwrite(&bmpfhr.bfType, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfSize, sizeof(uint32_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfReserved1, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfReserved2, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfOffBits, sizeof(uint32_t), 1, fbmpw);
     fwrite(&bmpihr, sizeof(BITMAPINFOHEADER), 1, fbmpw);
 
-    // RGB ƒf[ƒ^‚Ì‘‚«‚İA‹t‡‚É‚·‚é
+    // RGB ãƒ‡ãƒ¼ã‚¿ã®æ›¸ãè¾¼ã¿ã€é€†é †ã«ã™ã‚‹
     for (y=0; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             blue = hw_lapd[((bmpihr.biHeight-1)-y)*bmpihr.biWidth+x] & 0xff;
@@ -118,13 +123,13 @@ void laplacian_filter_soft(int *cam_fb, int *lap_fb, long width, long height)
     int a, b;
     int fl, sl, tl;
 
-    // line_buf ‚Ì1ŸŒ³–Ú‚Ì”z—ñ‚ğƒAƒƒP[ƒg‚·‚é
+    // line_buf ã®1æ¬¡å…ƒç›®ã®é…åˆ—ã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã™ã‚‹
     if ((line_buf =(int **)malloc(sizeof(int *) * 3)) == NULL){
         fprintf(stderr, "Can't allocate line_buf[3][]\n");
         exit(1);
     }
 
-    // ƒƒ‚ƒŠ‚ğƒAƒƒP[ƒg‚·‚é
+    // ãƒ¡ãƒ¢ãƒªã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã™ã‚‹
     for (i=0; i<3; i++){
         if ((line_buf[i]=(int *)malloc(sizeof(int) * width)) == NULL){
             fprintf(stderr, "Can't allocate line_buf[%d]\n", i);
@@ -137,41 +142,41 @@ void laplacian_filter_soft(int *cam_fb, int *lap_fb, long width, long height)
         exit(1);
     }
 
-    // RGB’l‚ğYi‹P“x¬•ªj‚Ì‚İ‚É•ÏŠ·‚µAƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^‚ğŠ|‚¯‚½B
+    // RGBå€¤ã‚’Yï¼ˆè¼åº¦æˆåˆ†ï¼‰ã®ã¿ã«å¤‰æ›ã—ã€ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ã‚’æ›ã‘ãŸã€‚
     for (y=0; y<height; y++){
         for (x=0; x<width; x++){
-            if (y==0 || y==height-1){ // c‚Ì‹«ŠE‚Ì‚Ì’l‚Í0‚Æ‚·‚é
+            if (y==0 || y==height-1){ // ç¸¦ã®å¢ƒç•Œã®æ™‚ã®å€¤ã¯0ã¨ã™ã‚‹
                 lap_fil_val = 0;
-            }else if (x==0 || x==width-1){ // ‰¡‚Ì‹«ŠE‚Ì‚à’l‚Í0‚Æ‚·‚é
+            }else if (x==0 || x==width-1){ // æ¨ªã®å¢ƒç•Œã®æ™‚ã‚‚å€¤ã¯0ã¨ã™ã‚‹
                 lap_fil_val = 0;
             }else{
-                if (y == 1 && x == 1){ // Å‰‚Ìƒ‰ƒCƒ“‚ÌÅ‰‚ÌƒsƒNƒZƒ‹‚Å‚Í2ƒ‰ƒCƒ“•ª‚Ì‰æ‘f‚ğ“Ç‚İo‚·
-                    for (a=0; a<2; a++){ // 2ƒ‰ƒCƒ“•ª
-                        for (b=0; b<width; b++){ // ƒ‰ƒCƒ“
+                if (y == 1 && x == 1){ // æœ€åˆã®ãƒ©ã‚¤ãƒ³ã®æœ€åˆã®ãƒ”ã‚¯ã‚»ãƒ«ã§ã¯2ãƒ©ã‚¤ãƒ³åˆ†ã®ç”»ç´ ã‚’èª­ã¿å‡ºã™
+                    for (a=0; a<2; a++){ // 2ãƒ©ã‚¤ãƒ³åˆ†
+                        for (b=0; b<width; b++){ // ãƒ©ã‚¤ãƒ³
                             line_buf[a][b] = cam_fb[(a*width)+b];
                             line_buf[a][b] = conv_rgb2y_soft(line_buf[a][b]);
                         }
                     }
                 }
-                if (x == 1) {    // ƒ‰ƒCƒ“‚ÌÅ‰‚È‚Ì‚ÅA2‚Â‚ÌƒsƒNƒZƒ‹‚ğ“Ç‚İ‚Ş
-                    for (b=0; b<2; b++){ // ƒ‰ƒCƒ“
+                if (x == 1) {    // ãƒ©ã‚¤ãƒ³ã®æœ€åˆãªã®ã§ã€2ã¤ã®ãƒ”ã‚¯ã‚»ãƒ«ã‚’èª­ã¿è¾¼ã‚€
+                    for (b=0; b<2; b++){ // ãƒ©ã‚¤ãƒ³
                         line_buf[(y+1)%3][b] = cam_fb[((y+1)*width)+b];
-                        // (y+1)%3 ‚ÍAg—pÏ‚İ‚Ìƒ‰ƒCƒ“‚ª‚É“Ç‚İ‚ŞAy=2 ‚Ì line[0], y=3‚Ì line[1], y=4‚Ì line[2]
+                        // (y+1)%3 ã¯ã€ä½¿ç”¨æ¸ˆã¿ã®ãƒ©ã‚¤ãƒ³ãŒã«èª­ã¿è¾¼ã‚€ã€y=2 ã®æ™‚ line[0], y=3ã®æ™‚ line[1], y=4ã®æ™‚ line[2]
                         line_buf[(y+1)%3][b] = conv_rgb2y_soft(line_buf[(y+1)%3][b]);
                     }
                 }
 
-                // 1‚Â‚ÌƒsƒNƒZƒ‹‚ğ“Ç‚İ‚İ‚È‚ª‚çƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^‚ğÀs‚·‚é
+                // 1ã¤ã®ãƒ”ã‚¯ã‚»ãƒ«ã‚’èª­ã¿è¾¼ã¿ãªãŒã‚‰ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿ã‚’å®Ÿè¡Œã™ã‚‹
                 line_buf[(y+1)%3][x+1] = cam_fb[((y+1)*width)+(x+1)];
-                // (y+1)%3 ‚ÍAg—pÏ‚İ‚Ìƒ‰ƒCƒ“‚ª‚É“Ç‚İ‚ŞAy=2 ‚Ì line[0], y=3‚Ì line[1], y=4‚Ì line[2]
+                // (y+1)%3 ã¯ã€ä½¿ç”¨æ¸ˆã¿ã®ãƒ©ã‚¤ãƒ³ãŒã«èª­ã¿è¾¼ã‚€ã€y=2 ã®æ™‚ line[0], y=3ã®æ™‚ line[1], y=4ã®æ™‚ line[2]
                 line_buf[(y+1)%3][x+1] = conv_rgb2y_soft(line_buf[(y+1)%3][x+1]);
 
-                fl = (y-1)%3;    // Å‰‚Ìƒ‰ƒCƒ“, y=1 012, y=2 120, y=3 201, y=4 012
-                sl = y%3;        // 2”Ô‚ß‚Ìƒ‰ƒCƒ“
-                tl = (y+1)%3;    // 3”Ô–Ú‚Ìƒ‰ƒCƒ“
+                fl = (y-1)%3;    // æœ€åˆã®ãƒ©ã‚¤ãƒ³, y=1 012, y=2 120, y=3 201, y=4 012
+                sl = y%3;        // 2ç•ªã‚ã®ãƒ©ã‚¤ãƒ³
+                tl = (y+1)%3;    // 3ç•ªç›®ã®ãƒ©ã‚¤ãƒ³
                 lap_fil_val = laplacian_fil_soft(line_buf[fl][x-1], line_buf[fl][x], line_buf[fl][x+1], line_buf[sl][x-1], line_buf[sl][x], line_buf[sl][x+1], line_buf[tl][x-1], line_buf[tl][x], line_buf[tl][x+1]);
             }
-            // ƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^Eƒf[ƒ^‚Ì‘‚«‚İ
+            // ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ãƒ»ãƒ‡ãƒ¼ã‚¿ã®æ›¸ãè¾¼ã¿
             lap_fb[(y*width)+x] = (lap_fil_val<<16)+(lap_fil_val<<8)+lap_fil_val ;
         }
     }
@@ -181,11 +186,11 @@ void laplacian_filter_soft(int *cam_fb, int *lap_fb, long width, long height)
     free(line_buf);
 }
 
-// RGB‚©‚çY‚Ö‚Ì•ÏŠ·
-// RGB‚ÌƒtƒH[ƒ}ƒbƒg‚ÍA{8'd0, R(8bits), G(8bits), B(8bits)}, 1pixel = 32bits
-// ‹P“xM†Y‚Ì‚İ‚É•ÏŠ·‚·‚éB•ÏŠ·®‚ÍAY =  0.299R + 0.587G + 0.114B
-// "YUVƒtƒH[ƒ}ƒbƒg‹y‚Ñ YUV<->RGB•ÏŠ·"‚ğQl‚É‚µ‚½Bhttp://vision.kuee.kyoto-u.ac.jp/~hiroaki/firewire/yuv.html
-//@2013/09/27 : float ‚ğ~‚ß‚ÄA‚·‚×‚Äint ‚É‚µ‚½
+// RGBã‹ã‚‰Yã¸ã®å¤‰æ›
+// RGBã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¯ã€{8'd0, R(8bits), G(8bits), B(8bits)}, 1pixel = 32bits
+// è¼åº¦ä¿¡å·Yã®ã¿ã«å¤‰æ›ã™ã‚‹ã€‚å¤‰æ›å¼ã¯ã€Y =  0.299R + 0.587G + 0.114B
+// "YUVãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆåŠã³ YUV<->RGBå¤‰æ›"ã‚’å‚è€ƒã«ã—ãŸã€‚http://vision.kuee.kyoto-u.ac.jp/~hiroaki/firewire/yuv.html
+//ã€€2013/09/27 : float ã‚’æ­¢ã‚ã¦ã€ã™ã¹ã¦int ã«ã—ãŸ
 int conv_rgb2y_soft(int rgb){
     int r, g, b, y_f;
     int y;
@@ -194,13 +199,13 @@ int conv_rgb2y_soft(int rgb){
     g = (rgb>>8) & 0xff;
     r = (rgb>>16) & 0xff;
 
-    y_f = 77*r + 150*g + 29*b; //y_f = 0.299*r + 0.587*g + 0.114*b;‚ÌŒW”‚É256”{‚µ‚½
-    y = y_f >> 8; // 256‚ÅŠ„‚é
+    y_f = 77*r + 150*g + 29*b; //y_f = 0.299*r + 0.587*g + 0.114*b;ã®ä¿‚æ•°ã«256å€ã—ãŸ
+    y = y_f >> 8; // 256ã§å‰²ã‚‹
 
     return(y);
 }
 
-// ƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^
+// ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿
 // x0y0 x1y0 x2y0 -1 -1 -1
 // x0y1 x1y1 x2y1 -1  8 -1
 // x0y2 x1y2 x2y2 -1 -1 -1
