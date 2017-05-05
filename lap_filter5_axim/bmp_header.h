@@ -1,39 +1,37 @@
 // bmp_header.h
-// 2015/07/17 by Masaaki Ono
-//
-// BMP ƒtƒ@ƒCƒ‹ƒtƒH[ƒ}ƒbƒg‚©‚çˆø—p
+// BMP ãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‹ã‚‰å¼•ç”¨ã•ã›ã¦é ‚ãã¾ã—ãŸ
 // http://www.kk.iij4u.or.jp/~kondo/bmp/
+//
+// 2017/05/04 : takseiã•ã‚“ã®ã”æŒ‡æ‘˜ã«ã‚ˆã‚ŠintX_tã‚’ä½¿ã£ãŸå®£è¨€ã«å¤‰æ›´ã€‚takseiã•ã‚“ã‚ã‚ŠãŒã¨ã†ã”ã–ã„ã¾ã—ãŸ
+//              å¤‰æ•°ã®å‹ã®ã‚µã‚¤ã‚ºã®é•ã„ã«ã‚ˆã£ã¦Linuxã®ï¼–ï¼”ãƒ“ãƒƒãƒˆç‰ˆã§ã¯å‹•ä½œã—ãªã‹ã£ãŸãŸã‚ã§ã™
+//              http://marsee101.blog19.fc2.com/blog-entry-3354.html#comment2808
 //
 
 #include <stdio.h>
+#include <stdint.h>
 
-#pragma once
-
-#ifndef BMP_HEADER_H_
-#define BMP_HEADER_H_
-// TODO: ƒvƒƒOƒ‰ƒ€‚É•K—v‚È’Ç‰Áƒwƒbƒ_[‚ğ‚±‚±‚ÅQÆ‚µ‚Ä‚­‚¾‚³‚¢B
 // BITMAPFILEHEADER 14bytes
 typedef struct tagBITMAPFILEHEADER {
-  unsigned short bfType;
-  unsigned long  bfSize;
-  unsigned short bfReserved1;
-  unsigned short bfReserved2;
-  unsigned long  bfOffBits;
+	uint16_t bfType;
+	uint32_t bfSize;
+	uint16_t bfReserved1;
+	uint16_t bfReserved2;
+	uint32_t bfOffBits;
 } BITMAPFILEHEADER;
 
 // BITMAPINFOHEADER 40bytes
 typedef struct tagBITMAPINFOHEADER{
-    unsigned long  biSize;
-    long           biWidth;
-    long           biHeight;
-    unsigned short biPlanes;
-    unsigned short biBitCount;
-    unsigned long  biCompression;
-    unsigned long  biSizeImage;
-    long           biXPixPerMeter;
-    long           biYPixPerMeter;
-    unsigned long  biClrUsed;
-    unsigned long  biClrImporant;
+	uint32_t biSize;
+	int32_t biWidth;
+	int32_t biHeight;
+	uint16_t biPlanes;
+	uint16_t biBitCount;
+	uint32_t biCompression;
+	uint32_t biSizeImage;
+	int32_t biXPixPerMeter;
+	int32_t biYPixPerMeter;
+	uint32_t biClrUsed;
+	uint32_t biClrImporant;
 } BITMAPINFOHEADER;
 
 typedef struct BMP24bitsFORMAT {
@@ -41,5 +39,3 @@ typedef struct BMP24bitsFORMAT {
     unsigned char green;
     unsigned char red;
 } BMP24FORMAT;
-
-#endif /* BMP_HEADER_H_ */
