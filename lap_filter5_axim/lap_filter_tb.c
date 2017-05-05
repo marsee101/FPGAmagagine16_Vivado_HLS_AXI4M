@@ -1,8 +1,11 @@
 // Testbench of laplacian_filter.c
 // lap_filter_tb.c
-// BMPƒf[ƒ^‚ğƒn[ƒhƒEƒFƒA‚Æƒ\ƒtƒgƒEƒFƒA‚ÅAƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^‚ğŠ|‚¯‚ÄA‚»‚ê‚ğ”äŠr‚·‚é
+// BMPãƒ‡ãƒ¼ã‚¿ã‚’ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã¨ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã§ã€ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿ã‚’æ›ã‘ã¦ã€ãã‚Œã‚’æ¯”è¼ƒã™ã‚‹
 // m_axi offset=slave version
 // 2015/08/26 by marsee
+// 2017/05/04 : takseiã•ã‚“ã®ã”æŒ‡æ‘˜ã«ã‚ˆã‚ŠintX_tã‚’ä½¿ã£ãŸå®£è¨€ã«å¤‰æ›´ã€‚takseiã•ã‚“ã‚ã‚ŠãŒã¨ã†ã”ã–ã„ã¾ã—ãŸ
+//              å¤‰æ•°ã®å‹ã®ã‚µã‚¤ã‚ºã®é•ã„ã«ã‚ˆã£ã¦Linuxã®ï¼–ï¼”ãƒ“ãƒƒãƒˆç‰ˆã§ã¯å‹•ä½œã—ãªã‹ã£ãŸãŸã‚ã§ã™
+//              http://marsee101.blog19.fc2.com/blog-entry-3354.html#comment2808
 //
 
 #include <stdio.h>
@@ -21,8 +24,8 @@ int main()
 {
     int *s, *h;
     long x, y;
-    BITMAPFILEHEADER bmpfhr; // BMPƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒwƒbƒ_(for Read)
-    BITMAPINFOHEADER bmpihr; // BMPƒtƒ@ƒCƒ‹‚ÌINFOƒwƒbƒ_(for Read)
+    BITMAPFILEHEADER bmpfhr; // BMPãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ˜ãƒƒãƒ€(for Read)
+    BITMAPINFOHEADER bmpihr; // BMPãƒ•ã‚¡ã‚¤ãƒ«ã®INFOãƒ˜ãƒƒãƒ€(for Read)
     FILE *fbmpr, *fbmpw;
     int *rd_bmp, *hw_lapd, *sw_lapd;
     int blue, green, red;
@@ -30,19 +33,19 @@ int main()
     struct timeval start_time_hw, end_time_hw;
     struct timeval start_time_sw, end_time_sw;
 
-    if ((fbmpr = fopen("test.bmp", "rb")) == NULL){ // test.bmp ‚ğƒI[ƒvƒ“
+    if ((fbmpr = fopen("test.bmp", "rb")) == NULL){ // test.bmp ã‚’ã‚ªãƒ¼ãƒ—ãƒ³
         fprintf(stderr, "Can't open test.bmp by binary read mode\n");
         exit(1);
     }
-    // bmpƒwƒbƒ_‚Ì“Ç‚İo‚µ
-    fread(&bmpfhr.bfType, sizeof(char), 2, fbmpr);
-    fread(&bmpfhr.bfSize, sizeof(long), 1, fbmpr);
-    fread(&bmpfhr.bfReserved1, sizeof(short), 1, fbmpr);
-    fread(&bmpfhr.bfReserved2, sizeof(short), 1, fbmpr);
-    fread(&bmpfhr.bfOffBits, sizeof(long), 1, fbmpr);
+    // bmpãƒ˜ãƒƒãƒ€ã®èª­ã¿å‡ºã—
+    fread(&bmpfhr.bfType, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfSize, sizeof(uint32_t), 1, fbmpr);
+    fread(&bmpfhr.bfReserved1, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfReserved2, sizeof(uint16_t), 1, fbmpr);
+    fread(&bmpfhr.bfOffBits, sizeof(uint32_t), 1, fbmpr);
     fread(&bmpihr, sizeof(BITMAPINFOHEADER), 1, fbmpr);
 
-    // ƒsƒNƒZƒ‹‚ğ“ü‚ê‚éƒƒ‚ƒŠ‚ğƒAƒƒP[ƒg‚·‚é
+    // ãƒ”ã‚¯ã‚»ãƒ«ã‚’å…¥ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªã‚’ã‚¢ãƒ­ã‚±ãƒ¼ãƒˆã™ã‚‹
     if ((rd_bmp =(int *)malloc(sizeof(int) * (bmpihr.biWidth * bmpihr.biHeight))) == NULL){
         fprintf(stderr, "Can't allocate rd_bmp memory\n");
         exit(1);
@@ -56,7 +59,7 @@ int main()
         exit(1);
     }
 
-    // rd_bmp ‚ÉBMP‚ÌƒsƒNƒZƒ‹‚ğ‘ã“üB‚»‚ÌÛ‚ÉAs‚ğ‹t“]‚·‚é•K—v‚ª‚ ‚é
+    // rd_bmp ã«BMPã®ãƒ”ã‚¯ã‚»ãƒ«ã‚’ä»£å…¥ã€‚ãã®éš›ã«ã€è¡Œã‚’é€†è»¢ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
     for (y=0; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             blue = fgetc(fbmpr);
@@ -67,10 +70,10 @@ int main()
     }
     fclose(fbmpr);
 
-    lap_filter_axim((int *)rd_bmp, (int *)hw_lapd);    // ƒn[ƒhƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^
-    laplacian_filter_soft(rd_bmp, sw_lapd, bmpihr.biWidth, bmpihr.biHeight);    // ƒ\ƒtƒgƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^
+    lap_filter_axim((int *)rd_bmp, (int *)hw_lapd);    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿
+    laplacian_filter_soft(rd_bmp, sw_lapd, bmpihr.biWidth, bmpihr.biHeight);    // ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿
 
-    // ƒn[ƒhƒEƒFƒA‚Æƒ\ƒtƒgƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“EƒtƒBƒ‹ƒ^‚Ì’l‚Ìƒ`ƒFƒbƒN
+    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã¨ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ»ãƒ•ã‚£ãƒ«ã‚¿ã®å€¤ã®ãƒã‚§ãƒƒã‚¯
     for (y=0, h=hw_lapd, s=sw_lapd; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             if (*h != *s){
@@ -84,20 +87,20 @@ int main()
     }
     printf("Success HW and SW results match\n");
 
-    // ƒn[ƒhƒEƒFƒA‚Ìƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^‚ÌŒ‹‰Ê‚ğ test_lap.bmp ‚Öo—Í‚·‚é
+    // ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢ã®ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿ã®çµæœã‚’ test_lap.bmp ã¸å‡ºåŠ›ã™ã‚‹
     if ((fbmpw=fopen("test_lap.bmp", "wb")) == NULL){
         fprintf(stderr, "Can't open test_lap.bmp by binary write mode\n");
         exit(1);
     }
-    // BMPƒtƒ@ƒCƒ‹ƒwƒbƒ_‚Ì‘‚«‚İ
-    fwrite(&bmpfhr.bfType, sizeof(char), 2, fbmpw);
-    fwrite(&bmpfhr.bfSize, sizeof(long), 1, fbmpw);
-    fwrite(&bmpfhr.bfReserved1, sizeof(short), 1, fbmpw);
-    fwrite(&bmpfhr.bfReserved2, sizeof(short), 1, fbmpw);
-    fwrite(&bmpfhr.bfOffBits, sizeof(long), 1, fbmpw);
+    // BMPãƒ•ã‚¡ã‚¤ãƒ«ãƒ˜ãƒƒãƒ€ã®æ›¸ãè¾¼ã¿
+    fwrite(&bmpfhr.bfType, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfSize, sizeof(uint32_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfReserved1, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfReserved2, sizeof(uint16_t), 1, fbmpw);
+    fwrite(&bmpfhr.bfOffBits, sizeof(uint32_t), 1, fbmpw);
     fwrite(&bmpihr, sizeof(BITMAPINFOHEADER), 1, fbmpw);
 
-    // RGB ƒf[ƒ^‚Ì‘‚«‚İA‹t‡‚É‚·‚é
+    // RGB ãƒ‡ãƒ¼ã‚¿ã®æ›¸ãè¾¼ã¿ã€é€†é †ã«ã™ã‚‹
     for (y=0; y<bmpihr.biHeight; y++){
         for (x=0; x<bmpihr.biWidth; x++){
             blue = hw_lapd[((bmpihr.biHeight-1)-y)*bmpihr.biWidth+x] & 0xff;
@@ -141,15 +144,15 @@ void laplacian_filter_soft(int *cam_fb, int *lap_fb, long width, long height)
             int y_val = conv_rgb2y(pix);
             pix_mat[2][2] = y_val;
 
-            line_buf[0][x] = line_buf[1][x];    // s‚Ì“ü‚ê‘Ö‚¦
+            line_buf[0][x] = line_buf[1][x];    // è¡Œã®å…¥ã‚Œæ›¿ãˆ
             line_buf[1][x] = y_val;
 
             lap_fil_val = laplacian_fil(    pix_mat[0][0], pix_mat[0][1], pix_mat[0][2],
                                         pix_mat[1][0], pix_mat[1][1], pix_mat[1][2],
                                         pix_mat[2][0], pix_mat[2][1], pix_mat[2][2]);
-            lap = (lap_fil_val<<16)+(lap_fil_val<<8)+lap_fil_val; // RGB“¯‚¶’l‚ğ“ü‚ê‚é
+            lap = (lap_fil_val<<16)+(lap_fil_val<<8)+lap_fil_val; // RGBåŒã˜å€¤ã‚’å…¥ã‚Œã‚‹
 
-            if (x<2 || y<2) // Å‰‚Ì2s‚Æ‚»‚Ì‘¼‚Ìs‚ÌÅ‰‚Ì2—ñ‚Í–³Œøƒf[ƒ^‚È‚Ì‚Å0‚Æ‚·‚é
+            if (x<2 || y<2) // æœ€åˆã®2è¡Œã¨ãã®ä»–ã®è¡Œã®æœ€åˆã®2åˆ—ã¯ç„¡åŠ¹ãƒ‡ãƒ¼ã‚¿ãªã®ã§0ã¨ã™ã‚‹
                 lap = 0;
 
             lap_fb[y*width+x] = lap;
@@ -157,11 +160,11 @@ void laplacian_filter_soft(int *cam_fb, int *lap_fb, long width, long height)
     }
 }
 
-// RGB‚©‚çY‚Ö‚Ì•ÏŠ·
-// RGB‚ÌƒtƒH[ƒ}ƒbƒg‚ÍA{8'd0, R(8bits), G(8bits), B(8bits)}, 1pixel = 32bits
-// ‹P“xM†Y‚Ì‚İ‚É•ÏŠ·‚·‚éB•ÏŠ·®‚ÍAY =  0.299R + 0.587G + 0.114B
-// "YUVƒtƒH[ƒ}ƒbƒg‹y‚Ñ YUV<->RGB•ÏŠ·"‚ğQl‚É‚µ‚½Bhttp://vision.kuee.kyoto-u.ac.jp/~hiroaki/firewire/yuv.html
-//@2013/09/27 : float ‚ğ~‚ß‚ÄA‚·‚×‚Äint ‚É‚µ‚½
+// RGBã‹ã‚‰Yã¸ã®å¤‰æ›
+// RGBã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¯ã€{8'd0, R(8bits), G(8bits), B(8bits)}, 1pixel = 32bits
+// è¼åº¦ä¿¡å·Yã®ã¿ã«å¤‰æ›ã™ã‚‹ã€‚å¤‰æ›å¼ã¯ã€Y =  0.299R + 0.587G + 0.114B
+// "YUVãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆåŠã³ YUV<->RGBå¤‰æ›"ã‚’å‚è€ƒã«ã—ãŸã€‚http://vision.kuee.kyoto-u.ac.jp/~hiroaki/firewire/yuv.html
+//ã€€2013/09/27 : float ã‚’æ­¢ã‚ã¦ã€ã™ã¹ã¦int ã«ã—ãŸ
 int conv_rgb2y_soft(int rgb){
     int r, g, b, y_f;
     int y;
@@ -170,13 +173,13 @@ int conv_rgb2y_soft(int rgb){
     g = (rgb>>8) & 0xff;
     r = (rgb>>16) & 0xff;
 
-    y_f = 77*r + 150*g + 29*b; //y_f = 0.299*r + 0.587*g + 0.114*b;‚ÌŒW”‚É256”{‚µ‚½
-    y = y_f >> 8; // 256‚ÅŠ„‚é
+    y_f = 77*r + 150*g + 29*b; //y_f = 0.299*r + 0.587*g + 0.114*b;ã®ä¿‚æ•°ã«256å€ã—ãŸ
+    y = y_f >> 8; // 256ã§å‰²ã‚‹
 
     return(y);
 }
 
-// ƒ‰ƒvƒ‰ƒVƒAƒ“ƒtƒBƒ‹ƒ^
+// ãƒ©ãƒ—ãƒ©ã‚·ã‚¢ãƒ³ãƒ•ã‚£ãƒ«ã‚¿
 // x0y0 x1y0 x2y0 -1 -1 -1
 // x0y1 x1y1 x2y1 -1  8 -1
 // x0y2 x1y2 x2y2 -1 -1 -1
