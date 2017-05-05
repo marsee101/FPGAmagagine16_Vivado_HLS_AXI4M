@@ -17,3 +17,8 @@ http://www.kumikomi.net/fpga/contents/0016.php
 ついに80倍高速化!AXI4マスタ版ラプラシアン・フィルタの最適化<BR>
 http://www.kumikomi.net/fpga/contents/0017.php<BR>
 lap_filter5_axim フォルダにファイルが入っています。<BR>
+
+2017/05/04 : takseiさんのご指摘によりintX_tを使った宣言に変更。takseiさんありがとうございました。<BR>
+             変数の型のサイズの違いによってLinuxの64ビット版では動作しなかったためです。<BR>
+              http://marsee101.blog19.fc2.com/blog-entry-3354.html#comment2808<BR>
+              
