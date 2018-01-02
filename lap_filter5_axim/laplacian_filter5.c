@@ -14,8 +14,8 @@ int conv_rgb2y(int rgb);
 int lap_filter_axim(volatile int cam_fb[ALL_PIXEL_VALUE], volatile int lap_fb[ALL_PIXEL_VALUE])
 {
 #pragma HLS INTERFACE s_axilite port=return
-#pragma HLS INTERFACE m_axi depth=480000 port=lap_fb
-#pragma HLS INTERFACE m_axi depth=480000 port=cam_fb
+#pragma HLS INTERFACE m_axi depth=480000 port=lap_fb offset=slave
+#pragma HLS INTERFACE m_axi depth=480000 port=cam_fb offset=slave
 
     int line_buf[3][HORIZONTAL_PIXEL_WIDTH];
 #pragma HLS array_partition variable=line_buf block factor=3 dim=1
